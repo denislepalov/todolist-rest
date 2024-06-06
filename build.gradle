@@ -1,0 +1,67 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.1.1'
+	id 'io.spring.dependency-management' version '1.1.0'
+	id "io.freefair.lombok" version "8.1.0"
+}
+
+group = 'lepdv'
+version = '2.0'
+
+java {
+	sourceCompatibility = '17'
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+apply from: 'version.gradle'
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.data:spring-data-envers'
+	implementation "org.modelmapper:modelmapper:${verions.modelmapper}"
+	implementation 'org.liquibase:liquibase-core'
+	implementation "io.swagger:swagger-annotations:${verions.swaggerAnnotations}"
+	implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${verions.springdocOpenapiStarterWebmvcUi}"
+	implementation "io.jsonwebtoken:jjwt:${verions.jjwt}"
+	implementation 'com.h2database:h2'
+
+	runtimeOnly 'org.postgresql:postgresql'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'org.testcontainers:junit-jupiter'
+	testImplementation 'org.testcontainers:postgresql'
+	testImplementation "com.atlassian.oai:swagger-request-validator-mockmvc:${verions.swaggerRequestValidatorMockmvc}"
+}
+
+test {
+	useJUnitPlatform {
+		filter {
+			includeTestsMatching "*Test"
+		}
+	}
+}
+
+tasks.register("integrationTest", Test) {
+	group = 'integration-test'
+	useJUnitPlatform {
+		filter {
+			includeTestsMatching "*IT"
+		}
+	}
+}
+check.dependsOn integrationTest
+integrationTest.dependsOn test

@@ -1,0 +1,11 @@
+ If you decide to use Docker-postgres-database instead of Inner-database-H2:
+
+ Create postgres docker-container -> In Terminal (path ~/todolist-rest/):
+
+ 1. cd docker
+
+ 2. docker compose -f postgres.yml up -d
+
+ or
+
+ 2. docker-compose -f postgres.yml up -d

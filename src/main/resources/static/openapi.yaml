@@ -1,0 +1,709 @@
+openapi: 3.0.0
+info:
+  title: TodoList REST API
+  description: TodoList REST API docs
+  version: "2.0"
+  #  contact:
+  #    name: dummy
+  #    email: dymmy@gmail.com
+servers:
+  - url: https://localhost:8080
+    description: Dev server
+security:
+  - bearerToken: []
+paths:
+  /api/v2/user:
+    get:
+      operationId: getUser
+      summary: Get authenticate user
+      tags:
+        - user-controller
+      responses:
+        "200":
+          description: Found the user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+    put:
+      operationId: updateUser
+      summary: Update authenticate user
+      tags:
+        - user-controller
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDto'
+        required: true
+      responses:
+        "200":
+          description: User was updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        default:
+          description: All unusual situations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorsBody'
+  /api/v2/user/edit-password:
+    put:
+      operationId: editPassword
+      summary: Edit user's password
+      tags:
+        - user-controller
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditPasswordDto'
+        required: true
+      responses:
+        "200":
+          description: User's password was edited
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: All unusual situations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorsBody'
+  /api/v2/user/delete-account:
+    delete:
+      operationId: deleteAccount
+      summary: Delete user's account
+      tags:
+        - user-controller
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CredentialsDto'
+        required: true
+      responses:
+        "200":
+          description: User's account was deleted
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: All unusual situations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorsBody'
+  /api/v2/tasks:
+    post:
+      operationId: createTask
+      summary: Create new task
+      tags:
+        - task-controller
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskDto'
+        required: true
+      responses:
+        "201":
+          description: New task is created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseTaskDto'
+        default:
+          description: All unusual situations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorsBody'
+  /api/v2/tasks/todo-list:
+    get:
+      operationId: getTodoList
+      summary: Returns list of tasks of authenticate user and sorted/filtered based on the query parameters
+      tags:
+        - task-controller
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 20
+      responses:
+        "200":
+          description: Found list of tasks of authenticate user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskListDto'
+  /api/v2/tasks/{id}:
+    get:
+      operationId: getTaskById
+      summary: Get task by its id
+      tags:
+        - task-controller
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Found the task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseTaskDto'
+        default:
+          description: All unusual situations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorsBody'
+    put:
+      operationId: updateTaskById
+      summary: Update task by its id
+      tags:
+        - task-controller
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaskDto'
+        required: true
+      responses:
+        "200":
+          description: Task was updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseTaskDto"
+        default:
+          description: All unusual situations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorsBody'
+    delete:
+      operationId: deleteTaskById
+      summary: Delete task by its id
+      tags:
+        - task-controller
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Task was deleted
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: All unusual situations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorsBody'
+  /api/v2/tasks/{id}/mark-as-completed:
+    put:
+      operationId: markAsCompletedById
+      summary: Mark task as completed by its id
+      tags:
+        - task-controller
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Task was marked as completed
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: All unusual situations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorsBody'
+  /api/v2/admin/users:
+    get:
+      operationId: getAllUsers
+      description: Returns a list of users and sorted/filtered based on the query parameters
+      tags:
+        - admin-controller
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 20
+      responses:
+        "200":
+          description: Found all users
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserListDto'
+  /api/v2/admin/users/{id}:
+    get:
+      operationId: getUserById
+      summary: Get user by its id
+      tags:
+        - admin-controller
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Found the user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserForAdminDto'
+        default:
+          description: All unusual situations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorsBody'
+  /api/v2/admin/users/{id}/lock:
+    put:
+      operationId: lockUserById
+      summary: Lock user by its id
+      tags:
+        - admin-controller
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: User was locked
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: All unusual situations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorsBody'
+  /api/v2/admin/users/{id}/unlock:
+    put:
+      operationId: unlockUserById
+      summary: Unlock user by its id
+      tags:
+        - admin-controller
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: User was unlocked
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: All unusual situations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorsBody'
+  /api/v2/admin/users/{id}/delete:
+    delete:
+      operationId: deleteUserById
+      summary: Delete user by its id
+      tags:
+        - admin-controller
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CredentialsDto'
+        required: true
+      responses:
+        "200":
+          description: User was deleted
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: All unusual situations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorsBody'
+  /api/v2/admin/tasks:
+    get:
+      operationId: getAllTasks
+      summary: Returns list of tasks of all users and sorted/filtered based on the query parameters
+      tags:
+        - admin-controller
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 20
+      responses:
+        "200":
+          description: Found list of tasks of all users
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskListDto'
+  /api/v2/admin/tasks/{id}:
+    get:
+      operationId: getTaskById_1
+      summary: Get task by its id
+      tags:
+        - admin-controller
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Found the task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseTaskDto'
+        default:
+          description: All unusual situations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorsBody'
+  /api/v2/authenticate/login:
+    post:
+      operationId: performLogin
+      summary: Perform login by username and password
+      tags:
+        - auth-controller
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CredentialsDto'
+        required: true
+      responses:
+        "200":
+          description: Performing login was successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtDto'
+        default:
+          description: All unusual situations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorsBody'
+  /api/v2/authenticate/registration:
+    post:
+      operationId: register
+      summary: Registration new user
+      tags:
+        - auth-controller
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterDto'
+        required: true
+      responses:
+        "201":
+          description: Registration new user was successful, user is created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtDto'
+        default:
+          description: All unusual situations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorsBody'
+components:
+  schemas:
+    UserForAdminDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+        fullName:
+          type: string
+        dateOfBirth:
+          type: string
+          format: date
+        role:
+          type: string
+        isNonLocked:
+          type: boolean
+    UserListDto:
+      type: object
+      properties:
+        userList:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserForAdminDto'
+    CredentialsDto:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 100
+          description: Username
+          example: Ivan
+          nullable: false
+        password:
+          type: string
+          minLength: 3
+          maxLength: 100
+          description: Password
+          example: Ivan
+          nullable: false
+      required:
+        - username
+        - password
+    JwtDto:
+      type: object
+      properties:
+        jwt:
+          type: string
+    RegisterDto:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 100
+          nullable: false
+        password:
+          type: string
+          minLength: 3
+          maxLength: 100
+          nullable: false
+        fullName:
+          type: string
+          maxLength: 100
+        dateOfBirth:
+          type: string
+          format: date
+      required:
+        - username
+        - password
+    CreateTaskDto:
+      type: object
+      properties:
+        description:
+          type: string
+          nullable: false
+        dueDate:
+          type: string
+          format: date
+      required:
+        - description
+    ResponseTaskDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        description:
+          type: string
+        dateOfCreation:
+          type: string
+          format: date
+        dueDate:
+          type: string
+          format: date
+        isCompleted:
+          type: string
+        user:
+          type: string
+    TaskListDto:
+      type: object
+      properties:
+        taskList:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResponseTaskDto'
+    UpdateTaskDto:
+      type: object
+      properties:
+        description:
+          type: string
+        dueDate:
+          type: string
+          format: date
+    EditPasswordDto:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 100
+          nullable: false
+        oldPassword:
+          type: string
+          minLength: 3
+          maxLength: 100
+          nullable: false
+        newPassword:
+          type: string
+          minLength: 3
+          maxLength: 100
+          nullable: false
+      required:
+        - username
+        - oldPassword
+        - newPassword
+    UserDto:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 100
+        fullName:
+          type: string
+          maxLength: 100
+        dateOfBirth:
+          type: string
+          format: date
+    ErrorsBody:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          format: int32
+        errors:
+          type: array
+          items:
+            type: string
+        type:
+          type: string
+        path:
+          type: string
+        message:
+          type: string
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
